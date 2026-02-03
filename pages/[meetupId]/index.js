@@ -26,19 +26,18 @@ export async function getStaticPaths() {
   const client = await MongoClient.connect(
     "mongodb+srv://UsmanNadiry:nadiry2025@cluster0.wtqyrj6.mongodb.net/meetups"
   );
-  const db = client.db();
 
+  const db = client.db();
   const meetupsCollection = db.collection("meetups");
 
-  const meetups = await meetupsCollection.find({}, { _id: 1 }).toArray();
-
+  const meetups = await meetupsCollection.find({}, { projection: { _id: 1 } }).toArray();
   client.close();
 
   return {
-    fallback: true, // fallback: false =>  Show 404 if user visits a page not listed in paths ( like m3 or m7 etc)
+    fallback: 'blocking',
     paths: meetups.map((meetup) => ({
       params: { meetupId: meetup._id.toString() },
-    })), // generate array of paths dynamically
+    })),
   };
 }
 export async function getStaticProps(context) {
@@ -70,3 +69,5 @@ export async function getStaticProps(context) {
     },
   };
 }
+
+
